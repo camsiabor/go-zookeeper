@@ -109,6 +109,8 @@ type Conn struct {
 	logInfo bool // true if information messages are logged; false if only errors are logged
 
 	buf []byte
+
+	looping bool
 }
 
 // connOption represents a connection option.
@@ -220,6 +222,7 @@ func Connect(servers []string, sessionTimeout time.Duration, options ...connOpti
 	conn.setTimeouts(int32(sessionTimeout / time.Millisecond))
 
 	go func() {
+		conn.looping = true
 		conn.loop()
 		conn.flushRequests(ErrClosing)
 		conn.invalidateWatches(ErrClosing)
@@ -310,8 +313,8 @@ func WithMaxConnBufferSize(maxBufferSize int) connOption {
 }
 
 func (c *Conn) Close() {
+	c.looping = true
 	close(c.shouldQuit)
-
 	select {
 	case <-c.queueRequest(opClose, &closeRequest{}, &closeResponse{}, nil):
 	case <-time.After(time.Second):
@@ -477,6 +480,7 @@ func (c *Conn) sendRequest(
 }
 
 func (c *Conn) loop() {
+
 	for {
 		if err := c.connect(); err != nil {
 			// c.Close() was called
