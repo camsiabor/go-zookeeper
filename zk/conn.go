@@ -811,11 +811,11 @@ func (c *Conn) sendLoop() error {
 
 			binary.BigEndian.PutUint32(c.buf[:4], uint32(n))
 
-			c.conn.SetWriteDeadline(time.Now().Add(c.recvTimeout))
+			// c.conn.SetWriteDeadline(time.Now().Add(c.recvTimeout))
 			_, err = c.conn.Write(c.buf[:n+4])
-			c.conn.SetWriteDeadline(time.Time{})
+			// c.conn.SetWriteDeadline(time.Time{})
 			if err != nil {
-				c.conn.Close()
+				_ = c.conn.Close()
 				return err
 			}
 		case <-c.closeChan:
