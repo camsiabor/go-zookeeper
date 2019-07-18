@@ -111,6 +111,8 @@ type Conn struct {
 	buf []byte
 
 	looping bool
+
+	ReconnectInterval time.Duration
 }
 
 // connOption represents a connection option.
@@ -370,8 +372,11 @@ func (c *Conn) connect() error {
 		c.setState(StateConnecting)
 		if retryStart {
 			c.flushUnsentRequests(ErrNoServer)
+			if c.ReconnectInterval <= time.Second {
+				c.ReconnectInterval = time.Second * time.Duration(3)
+			}
 			select {
-			case <-time.After(time.Second):
+			case <-time.After(c.ReconnectInterval):
 				// pass
 			case <-c.shouldQuit:
 				c.setState(StateDisconnected)
