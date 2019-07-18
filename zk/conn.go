@@ -781,12 +781,12 @@ func (c *Conn) sendData(req *request) error {
 	c.requests[req.xid] = req
 	c.requestsLock.Unlock()
 
-	c.conn.SetWriteDeadline(time.Now().Add(c.recvTimeout))
+	//c.conn.SetWriteDeadline(time.Now().Add(c.recvTimeout))
 	_, err = c.conn.Write(c.buf[:n+4])
-	c.conn.SetWriteDeadline(time.Time{})
+	//c.conn.SetWriteDeadline(time.Time{})
 	if err != nil {
 		req.recvChan <- response{-1, err}
-		c.conn.Close()
+		_ = c.conn.Close()
 		return err
 	}
 
@@ -832,7 +832,7 @@ func (c *Conn) recvLoop(conn net.Conn) error {
 	buf := make([]byte, sz)
 	for {
 		// package length
-		conn.SetReadDeadline(time.Now().Add(c.recvTimeout))
+		//conn.SetReadDeadline(time.Now().Add(c.recvTimeout))
 		_, err := io.ReadFull(conn, buf[:4])
 		if err != nil {
 			return err
@@ -847,7 +847,7 @@ func (c *Conn) recvLoop(conn net.Conn) error {
 		}
 
 		_, err = io.ReadFull(conn, buf[:blen])
-		conn.SetReadDeadline(time.Time{})
+		//conn.SetReadDeadline(time.Time{})
 		if err != nil {
 			return err
 		}
