@@ -706,17 +706,17 @@ func (c *Conn) authenticate() error {
 
 	binary.BigEndian.PutUint32(buf[:4], uint32(n))
 
-	c.conn.SetWriteDeadline(time.Now().Add(c.recvTimeout * 10))
+	//c.conn.SetWriteDeadline(time.Now().Add(c.recvTimeout * 10))
 	_, err = c.conn.Write(buf[:n+4])
-	c.conn.SetWriteDeadline(time.Time{})
+	// c.conn.SetWriteDeadline(time.Time{})
 	if err != nil {
 		return err
 	}
 
 	// Receive and decode a connect response.
-	c.conn.SetReadDeadline(time.Now().Add(c.recvTimeout * 10))
+	// c.conn.SetReadDeadline(time.Now().Add(c.recvTimeout * 10))
 	_, err = io.ReadFull(c.conn, buf[:4])
-	c.conn.SetReadDeadline(time.Time{})
+	// c.conn.SetReadDeadline(time.Time{})
 	if err != nil {
 		return err
 	}
