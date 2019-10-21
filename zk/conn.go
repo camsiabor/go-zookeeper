@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -485,6 +486,8 @@ func (c *Conn) sendRequest(
 }
 
 func (c *Conn) loop() {
+
+	runtime.LockOSThread()
 
 	for {
 		if err := c.connect(); err != nil {
