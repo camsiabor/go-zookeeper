@@ -502,7 +502,7 @@ func (c *Conn) loop() {
 			c.invalidateWatches(err)
 		case err != nil && c.conn != nil:
 			c.logger.Printf("Authentication failed: %s", err)
-			c.conn.Close()
+			_ = c.conn.Close()
 		case err == nil:
 			if c.logInfo {
 				c.logger.Printf("Authenticated: id=%d, timeout=%d", c.SessionID(), c.sessionTimeoutMs)
