@@ -514,7 +514,11 @@ func (c *Conn) loop() {
 			var wg sync.WaitGroup
 			wg.Add(1)
 			go func() {
+
+				runtime.LockOSThread()
+
 				<-reauthChan
+
 				if c.debugCloseRecvLoop {
 					close(c.debugReauthDone)
 				}
@@ -528,6 +532,9 @@ func (c *Conn) loop() {
 
 			wg.Add(1)
 			go func() {
+
+				runtime.LockOSThread()
+
 				var err error
 				if c.debugCloseRecvLoop {
 					err = errors.New("DEBUG: close recv loop")
